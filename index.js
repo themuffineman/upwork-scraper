@@ -3,9 +3,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import {getRootDomain} from './utils.js'
-import dotenv from 'dotenv';
 
-dotenv.config()
 const server = express()
 server.use(bodyParser.json())
 server.use(cors({
@@ -15,8 +13,8 @@ server.listen(3000, () => {
   console.log('Server is running on port 3000')
 })
 
-server.get('/scrape/yelp', async (req, res) =>{
-  const {industry, location, pagination } = req.query
+server.post('/scrape/yelp', async (req, res) =>{
+  const {industry, location, pagination } = req.body
   console.info('Received Request')
   try {
     const browser = await puppeteer.launch({headless: true})
