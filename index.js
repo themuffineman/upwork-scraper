@@ -2,16 +2,22 @@ import puppeteer from 'puppeteer';
 import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import getRootDomain from './utils.js'
+import {getRootDomain} from './utils.js'
+import dotenv from 'dotenv';
 
+dotenv.config()
 const server = express()
 server.use(bodyParser.json())
 server.use(cors({
   origin: '*'
 }))
+server.listen(3000, () => {
+  console.log('Server is running on port 3000')
+})
 
-server.post('/scrape/yelp', async (req, res) =>{
-  const {industry, location, pagination } = req.body
+server.get('/scrape/yelp', async (req, res) =>{
+  const {industry, location, pagination } = req.query
+  console.info('Received Request')
   try {
     const browser = await puppeteer.launch({headless: true})
     const page = await browser.newPage()
@@ -22,7 +28,7 @@ server.post('/scrape/yelp', async (req, res) =>{
       })
     }
     await page.locator('ul.list__09f24__ynIEd').wait()
-    const results = await page.$$eval("ul.list__09f24__ynIEd li", ()=>{
+    const results = await page.$$eval("ul.list__09f24__ynIEd li", async ()=>{
       const result = []
       const list = document.querySelectorAll('ul.list__09f24__ynIEd li')
       for(const item of list){
@@ -46,4 +52,4 @@ server.post('/scrape/yelp', async (req, res) =>{
     console.error(error.message)
     res.sendStatus(500)
   }
-}
+})
