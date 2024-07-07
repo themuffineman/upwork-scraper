@@ -26,7 +26,7 @@ server.post("/scrape/yelp", async (req, res) => {
     await page.goto(
       `https://www.yelp.com/search?find_desc=${industry}&find_loc=${location}&start=${pagination * 10}`,
     );
-    if (page.$(h3.y - css - n2l5h3)) {
+    if (page.$('h3.y - css - n2l5h3')) {
       return res.status(400).send({
         message: "No more results",
       });
