@@ -22,21 +22,26 @@ server.post("/scrape/yelp", async (req, res) => {
   console.info("Received Request");
   try {
     browser = await puppeteer.launch({ headless: true });
+    consle.info("Browser Launched");
     page = await browser.newPage();
+    console.log('Created new page')
     await page.goto(
       `https://www.yelp.com/search?find_desc=${industry}&find_loc=${location}&start=${pagination * 10}`,
     );
+    console.log('Navigated to Yelp page')
     if (page.$('h3.y - css - n2l5h3')) {
       return res.status(400).send({
         message: "No more results",
       });
     }
     await page.locator("ul.list__09f24__ynIEd").wait();
+    consoe.log('Waited for list to load')
     const results = await page.$$eval("ul.list__09f24__ynIEd li", async () => {
       const result = [];
       const list = document.querySelectorAll("ul.list__09f24__ynIEd li");
       for (const item of list) {
         const name = item.querySelector("a.y-css-12ly5yx").innerText;
+        consle.log('Scraped Name: ' + name)
         const businessPageUrl = item.querySelector("a.y-css-12ly5yx").href;
 
         const businessPage = await browser.newPage();
