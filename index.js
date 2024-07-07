@@ -23,6 +23,7 @@ server.post("/scrape/yelp", async (req, res) => {
     browser = await puppeteer.launch({ headless: true });
     console.info("Browser Launched");
     page = await browser.newPage();
+    page.setDefaultTimeout(300000);
     console.log('Created new page')
     await page.goto(
       `https://www.yelp.com/search?find_desc=${industry}&find_loc=${location}&start=${pagination * 10}`,
@@ -44,6 +45,7 @@ server.post("/scrape/yelp", async (req, res) => {
         const businessPageUrl = item.querySelector("a.y-css-12ly5yx").href;
 
         const businessPage = await browser.newPage();
+        businessPage.setDefaultTimeout(300000);
         await businessPage.goto(businessPageUrl);
         await businessPage.locator("a.y-css-1rq499d").wait();
 
