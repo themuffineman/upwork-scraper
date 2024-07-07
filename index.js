@@ -14,7 +14,6 @@ server.use(
 server.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
-
 server.post("/scrape/yelp", async (req, res) => {
   const { industry, location, pagination } = req.body;
   let browser;
@@ -22,7 +21,7 @@ server.post("/scrape/yelp", async (req, res) => {
   console.info("Received Request");
   try {
     browser = await puppeteer.launch({ headless: true });
-    consle.info("Browser Launched");
+    console.info("Browser Launched");
     page = await browser.newPage();
     console.log('Created new page')
     await page.goto(
@@ -72,7 +71,7 @@ server.post("/scrape/yelp", async (req, res) => {
     console.error(error.message);
     res.sendStatus(500);
   }finally{
-    await page.close();
     await browser.close();
+    await page.close();
   }
 });
