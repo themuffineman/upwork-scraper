@@ -20,7 +20,7 @@ server.post("/scrape/yelp", async (req, res) => {
   let page;
   console.info("Received Request");
   try {
-    browser = await puppeteer.launch({ headless: false, timeout: 300000 });
+    browser = await puppeteer.launch({ headless: true, timeout: 300000 });
     console.info("Browser Launched");
     page = await browser.newPage();
     page.setDefaultTimeout(300000);
