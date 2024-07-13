@@ -73,7 +73,7 @@ server.post("/scrape/yelp", async (req, res) => {
     console.error(error.message);
     res.sendStatus(500);
   }finally{
-    await browser.close();
-    await page.close();
+    await page?.close();
+    await browser?.close();
   }
 });
