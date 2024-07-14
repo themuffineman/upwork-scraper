@@ -86,11 +86,6 @@ server.post("/scrape/yelp", async (req, res) => {
         item.source = "yelp";
         
       }catch (error){
-        if (error.message.includes('Navigating frame was detached')) {
-          console.warn('Navigating frame was detached, skipping this item:', item.name);
-        } else {
-          console.error('Error navigating or scraping:', error);
-        }
         await businessPage.close();
         continue;
       }finally{
