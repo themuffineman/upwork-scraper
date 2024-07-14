@@ -54,14 +54,17 @@ server.post("/scrape/yelp", async (req, res) => {
       const result = [];
       const list = document.querySelectorAll("ul.list__09f24__ynIEd li");
       for (const item of list) {
-        const name = item.querySelector("a.y-css-12ly5yx").innerText;
+        const name = item.querySelector("a.y-css-12ly5yx")?.innerText;
+        if(!name){
+          continue;
+        }
         console.log('Scraped Name: ' + name)
-        const businessPageUrl = item.querySelector("a.y-css-12ly5y x").href;
+        const businessPageUrl = item.querySelector("a.y-css-12ly5yx").href;
 
         const businessPage = await browser.newPage();
         businessPage.setDefaultTimeout(300000);
         await businessPage.goto(businessPageUrl);
-        await businessPage.locator("a.y-css-1rq499d").wait();
+        await businessPage.waitForSelector('a.y-css-1rq499d');
 
         const businessWebsite = await businessPage.$eval(
           "a.y-css-1rq499d",
