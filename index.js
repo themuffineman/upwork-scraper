@@ -21,7 +21,7 @@ server.post("/scrape/yelp", async (req, res) => {
   console.info("Received Request");
   try {
     browser = await puppeteer.launch({ 
-      timeout: 300000, 
+      protocolTimeout: 600000,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -64,7 +64,6 @@ server.post("/scrape/yelp", async (req, res) => {
     
     for (const item of results) {
       console.log('Scraped Name: ', item.name);
-      console.log('Page Url: ', item.businessPageUrl);
     
       const businessPage = await browser.newPage();
       businessPage.setDefaultTimeout(300000);
