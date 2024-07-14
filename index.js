@@ -49,13 +49,13 @@ server.post("/scrape/yelp", async (req, res) => {
     //   });
     // }
     await page.waitForSelector('ul.list__09f24__ynIEd')
-    consoe.log('Waited for list to load')
+    console.log('Waited for list to load')
     const results = await page.$$eval("ul.list__09f24__ynIEd li", async () => {
       const result = [];
       const list = document.querySelectorAll("ul.list__09f24__ynIEd li");
       for (const item of list) {
         const name = item.querySelector("a.y-css-12ly5yx").innerText;
-        consle.log('Scraped Name: ' + name)
+        console.log('Scraped Name: ' + name)
         const businessPageUrl = item.querySelector("a.y-css-12ly5y x").href;
 
         const businessPage = await browser.newPage();
