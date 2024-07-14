@@ -50,42 +50,46 @@ server.post("/scrape/yelp", async (req, res) => {
     // }
     await page.waitForSelector('ul.list__09f24__ynIEd')
     console.log('Waited for list to load')
-    const results = await page.$$eval("ul.list__09f24__ynIEd li", async () => {
+    const results = await page.$$eval("ul.list__09f24__ynIEd li", listItems => {
       const result = [];
-      const list = document.querySelectorAll("ul.list__09f24__ynIEd li");
-      console.log('Lists contained')
-      for (const item of list) {
+      listItems.forEach(item => {
         const name = item.querySelector("a.y-css-12ly5yx")?.innerText;
-        if(!name){
-          continue;
+        if (name) {
+          const businessPageUrl = item.querySelector("a.y-css-12ly5yx").href;
+          result.push({ name, businessPageUrl });
         }
-        console.log('Scraped Name: ' + name)
-        const businessPageUrl = item.querySelector("a.y-css-12ly5yx").href;
-        console.log('Page Url: ', businessPageUrl)
-        const businessPage = await browser.newPage();
-        businessPage.setDefaultTimeout(300000);
-        await businessPage.goto(businessPageUrl);
-        await businessPage.waitForSelector('a.y-css-1rq499d');
-
-        const businessWebsite = await businessPage.$eval(
-          "a.y-css-1rq499d",
-          (el) => getRootDomain(el.href, browser),
-        );
-        const businessPhone = await businessPage.$eval(
-          "p.y-css-1o34y7f",
-          (el) => el.innerText,
-        );
-
-        result.push({
-          name,
-          website: businessWebsite,
-          phone: businessPhone,
-          source: "yelp",
-        });
-        await businessPage.close();
-      }
+      });
       return result;
     });
+    
+    for (const item of results) {
+      console.log('Scraped Name: ', item.name);
+      console.log('Page Url: ', item.businessPageUrl);
+    
+      const businessPage = await browser.newPage();
+      businessPage.setDefaultTimeout(300000);
+      await businessPage.goto(item.businessPageUrl);
+      await businessPage.waitForSelector('a.y-css-1rq499d');
+    
+      const businessWebsite = await businessPage.$eval(
+        "a.y-css-1rq499d",
+        el => el.href
+      );
+    
+      const businessPhone = await businessPage.$eval(
+        "p.y-css-1o34y7f",
+        el => el.innerText
+      );
+    
+      item.website = businessWebsite;
+      item.phone = businessPhone;
+      item.source = "yelp";
+    
+      await businessPage.close();
+    }
+    
+    console.log(results);
+    
     res.json({ results }).status(200);
   }catch (error) {
     console.error(error.message);
