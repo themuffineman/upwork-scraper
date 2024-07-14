@@ -48,7 +48,7 @@ server.post("/scrape/yelp", async (req, res) => {
         message: "No more results",
       });
     }
-    await page.locator("ul.list__09f24__ynIEd").wait();
+    await page.waitForSelector('ul.list__09f24__ynIEd')
     consoe.log('Waited for list to load')
     const results = await page.$$eval("ul.list__09f24__ynIEd li", async () => {
       const result = [];
