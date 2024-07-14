@@ -20,7 +20,21 @@ server.post("/scrape/yelp", async (req, res) => {
   let page;
   console.info("Received Request");
   try {
-    browser = await puppeteer.launch({ headless: true, timeout: 300000 });
+    browser = await puppeteer.launch({ 
+      timeout: 300000, 
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--no-zygote',
+        '--single-process',
+        '--disable-extensions',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding'
+      ]
+    });
     console.info("Browser Launched");
     page = await browser.newPage();
     page.setDefaultTimeout(300000);
@@ -42,7 +56,7 @@ server.post("/scrape/yelp", async (req, res) => {
       for (const item of list) {
         const name = item.querySelector("a.y-css-12ly5yx").innerText;
         consle.log('Scraped Name: ' + name)
-        const businessPageUrl = item.querySelector("a.y-css-12ly5yx").href;
+        const businessPageUrl = item.querySelector("a.y-css-12ly5y x").href;
 
         const businessPage = await browser.newPage();
         businessPage.setDefaultTimeout(300000);
