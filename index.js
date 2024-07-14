@@ -64,29 +64,41 @@ server.post("/scrape/yelp", async (req, res) => {
     
     for (const item of results) {
       console.log('Scraped Name: ', item.name);
-    
+
       const businessPage = await browser.newPage();
-      businessPage.setDefaultTimeout(300000);
-      await businessPage.goto(item.businessPageUrl);
-      await businessPage.waitForSelector('a.y-css-1rq499d');
+      try {
+        businessPage.setDefaultTimeout(300000);
+        await businessPage.goto(item.businessPageUrl);
+        await businessPage.waitForSelector('a.y-css-1rq499d');
+      
+        const businessWebsite = await businessPage.$eval(
+          "a.y-css-1rq499d",
+          el => el.href
+        );
+      
+        const businessPhone = await businessPage.$eval(
+          "p.y-css-1o34y7f",
+          el => el.innerText
+        );
+      
+        item.website = businessWebsite;
+        item.phone = businessPhone;
+        item.source = "yelp";
+        
+      }catch (error){
+        if (error.message.includes('Navigating frame was detached')) {
+          console.warn('Navigating frame was detached, skipping this item:', item.name);
+        } else {
+          console.error('Error navigating or scraping:', error);
+        }
+        await businessPage.close();
+        continue;
+      }finally{
+        await businessPage.close();
+      }
     
-      const businessWebsite = await businessPage.$eval(
-        "a.y-css-1rq499d",
-        el => el.href
-      );
     
-      const businessPhone = await businessPage.$eval(
-        "p.y-css-1o34y7f",
-        el => el.innerText
-      );
-    
-      item.website = businessWebsite;
-      item.phone = businessPhone;
-      item.source = "yelp";
-    
-      await businessPage.close();
     }
-    
     console.log(results);
     
     res.json({ results }).status(200);
